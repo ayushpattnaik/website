@@ -5,11 +5,11 @@ subtitle: Find detailed instructions for integration across various platforms an
 summary: >-
   Covers the integration of Neon with various authentication services and
   deployment platforms, providing detailed instructions for developers to
-  connect and utilize Neon Postgres in their applications.
+  connect and use Neon Postgres in their applications.
 enableTableOfContents: true
 redirectFrom:
   - /docs/integrations/integrations-list/
-updatedOn: '2026-02-06T22:07:32.986Z'
+updatedOn: '2026-03-20T18:41:23.214Z'
 ---
 
 ## Authentication
@@ -133,6 +133,8 @@ updatedOn: '2026-02-06T22:07:32.986Z'
 <a href="https://docs.peerdb.io/mirror/cdc-neon-clickhouse" title="ClickHouse" description="Change Data Capture from Neon to ClickHouse with PeerDB (PeerDB docs)" icon="clickhouse"></a>
 
 <a href="/docs/guides/logical-replication-kafka-confluent" title="Confluent (Kafka)" description="Replicate data from Neon with Confluent (Kafka)" icon="confluent"></a>
+
+<a href="/docs/guides/logical-replication-databricks" title="Databricks" description="Replicate data from Neon to Databricks with Lakeflow Connect" icon="databricks"></a>
 
 <a href="/docs/guides/logical-replication-decodable" title="Decodable" description="Replicate data from Neon with Decodable" icon="decodable"></a>
 

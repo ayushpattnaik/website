@@ -1,11 +1,9 @@
-/* eslint-disable react/prop-types */
-import clsx from 'clsx';
 import Image from 'next/image';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import PropTypes from 'prop-types';
-import { Fragment } from 'react';
 import remarkGfm from 'remark-gfm';
 
+import Callout from 'components/pages/doc/callout';
 import ChatOptions from 'components/pages/doc/chat-options';
 import CheckItem from 'components/pages/doc/check-item';
 import CheckList from 'components/pages/doc/check-list';
@@ -15,7 +13,6 @@ import DefinitionList from 'components/pages/doc/definition-list';
 import DetailIconCards from 'components/pages/doc/detail-icon-cards';
 import DocsLink from 'components/pages/doc/docs-link';
 import DocsList from 'components/pages/doc/docs-list';
-// eslint-disable-next-line import/no-cycle
 import IncludeBlock from 'components/pages/doc/include-block';
 import InfoBlock from 'components/pages/doc/info-block';
 import LinkPreview from 'components/pages/doc/link-preview';
@@ -28,9 +25,8 @@ import TechCards from 'components/pages/doc/tech-cards';
 import TwoColumnLayout from 'components/pages/doc/two-column-layout';
 import Video from 'components/pages/doc/video';
 import YoutubeIframe from 'components/pages/doc/youtube-iframe';
+import QuoteBlocksWrapper from 'components/pages/use-case/quote-blocks-wrapper';
 import SubscriptionForm from 'components/pages/use-case/subscription-form';
-import Testimonial from 'components/pages/use-case/testimonial';
-import TestimonialsWrapper from 'components/pages/use-case/testimonials-wrapper';
 import UseCaseContext from 'components/pages/use-case/use-case-context';
 import UseCaseList from 'components/pages/use-case/use-case-list';
 import Admonition from 'components/shared/admonition';
@@ -40,9 +36,8 @@ import AutoscalingViz from 'components/shared/autoscaling-viz';
 import Button from 'components/shared/button';
 import CodeBlock from 'components/shared/code-block';
 import ComputeCalculator from 'components/shared/compute-calculator';
-import CopyPrompt from 'components/shared/copy-prompt/copy-prompt';
+import CopyPrompt from 'components/shared/copy-prompt';
 // import CtaBlock from 'components/shared/cta-block';
-import DeployPostgresButton from 'components/shared/deploy-postgres-button';
 import DocCta from 'components/shared/doc-cta';
 import ExternalCode from 'components/shared/external-code';
 import GradientBorder from 'components/shared/gradient-border';
@@ -55,6 +50,7 @@ import RequestForm from 'components/shared/request-form';
 import SqlToRestConverter from 'components/shared/sql-to-rest-converter';
 import SubprocessorsForm from 'components/shared/subprocessors-form';
 import getCodeProps from 'lib/rehype-code-props';
+import { cn } from 'utils/cn';
 
 import sharedMdxComponents from '../../../../content/docs/shared-content';
 import FeatureList from '../feature-list';
@@ -83,8 +79,7 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
       <table {...props} />
     </div>
   ),
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  undefined: (props) => <Fragment {...props} />,
+  undefined: (props) => <>{props.children}</>,
   pre: (props) => {
     const codeElement = props?.children;
     const code = codeElement?.props?.children;
@@ -106,21 +101,26 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
   img: (props) => {
     const { className, title, src, ...rest } = props;
 
+    // AVIF/WebP optimization can flatten PNG/GIF alpha to black; keep originals for local /docs/ rasters.
+    const unoptimizedPreserveAlpha =
+      typeof src === 'string' && /^\/docs\/.+\.(png|gif)$/i.test(src);
+
     // No zoom on PostgreSQLTutorial Images
     if (!isPostgres) {
       return (
         <ImageZoom src={src}>
           <Image
-            className={clsx(
+            className={cn(
               className,
               { 'no-border': title === 'no-border' },
               isTemplate && 'rounded-lg'
             )}
             src={src}
-            width={isReleaseNote ? 762 : 796}
-            height={isReleaseNote ? 428 : 447}
+            width={704}
+            height={447}
             style={{ width: '100%', height: '100%' }}
             title={title !== 'no-border' ? title : undefined}
+            unoptimized={unoptimizedPreserveAlpha}
             {...rest}
           />
           {isTemplate && <GradientBorder className="rounded-lg" withBlend />}
@@ -131,7 +131,7 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
     return src.includes('?') ? (
       // Authors can use anchor tags to make images float right/left
       <Image
-        className={clsx(
+        className={cn(
           className,
           {
             'no-border':
@@ -149,7 +149,7 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
       />
     ) : (
       <Image
-        className={clsx(className, { 'no-border': title === 'no-border' })}
+        className={cn(className, { 'no-border': title === 'no-border' })}
         src={src}
         width={200}
         height={100}
@@ -166,6 +166,7 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
   DefinitionList,
   FeatureList,
   Admonition,
+  Callout,
   CodeTabs,
   DetailIconCards,
   TechCards,
@@ -184,8 +185,7 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
   LatencyCalculator,
   // TODO: revert to CTA: isTemplate ? CtaBlock : DocCta when design is ready
   CTA: (props) => <DocCta isTemplate={isTemplate} {...props} />,
-  Testimonial,
-  TestimonialsWrapper,
+  QuoteBlocksWrapper,
   UseCaseList,
   UseCaseContext,
   ComputeCalculator,
@@ -194,7 +194,6 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
   Steps,
   TwoColumnLayout,
   LogosSection,
-  DeployPostgresButton,
   ChatOptions,
   CheckList,
   CheckItem,
@@ -206,7 +205,6 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
   ...sharedComponents,
 });
 
-// eslint-disable-next-line no-return-assign
 const Content = ({
   className = null,
   content,
@@ -215,16 +213,18 @@ const Content = ({
   isReleaseNote = false,
   isPostgres = false,
   isTemplate = false,
-}) => (
-  <div
-    className={clsx(
-      'prose-doc post-content prose dark:prose-invert xs:prose-code:break-words',
-      className
-    )}
-  >
-    {asHTML ? (
-      <div dangerouslySetInnerHTML={{ __html: content }} />
-    ) : (
+}) => {
+  const rootClassName = cn(
+    'prose-doc post-content prose dark:prose-invert xs:prose-code:break-words',
+    className
+  );
+
+  if (asHTML) {
+    return <div className={rootClassName} dangerouslySetInnerHTML={{ __html: content }} />;
+  }
+
+  return (
+    <div className={rootClassName}>
       <MDXRemote
         components={getComponents(withoutAnchorHeading, isReleaseNote, isPostgres, isTemplate)}
         source={content}
@@ -240,9 +240,9 @@ const Content = ({
           blockDangerousJS: true,
         }}
       />
-    )}
-  </div>
-);
+    </div>
+  );
+};
 Content.propTypes = {
   className: PropTypes.string,
   content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,

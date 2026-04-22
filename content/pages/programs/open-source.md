@@ -8,6 +8,8 @@ image: '/images/social-previews/programs/open-source.jpg'
 
 <ProgramForm type="openSource" />
 
+<QuoteBlock quote="With Neon's serverless Postgres and the support from the Open Source Program, integrating a scalable database into Medusa was straightforward and fast. The developer experience has been outstanding, and it's helped us deliver a frictionless experience to our users." author="oli-juhl" role="CTO MedusaJS" />
+
 If you're building open source tools that use Postgres, we want to help you scale. Selected projects receive up to $5,000 yearly in platform credits, enrollment in a cash referral program, and marketing support to expand your project's visibility.
 
 ## What You'll Get
@@ -70,6 +72,6 @@ After the first year, we'll review your project's progress and impact. If your p
 <details>
 <summary>**How does the referral program work?**</summary>
 
-Once accepted into the program, you'll receive a unique referral link. When users sign up for Neon through your link and spend $10 or more, you'll receive $10. There's no cap on referral earnings, and payouts are processed monthly through GitHub Sponsors.
+Once accepted into the program, you'll receive a unique referral link. When users sign up for Neon through your link and spend $20 or more, you'll receive $20. There's no cap on referral earnings, and payouts are processed monthly through GitHub Sponsors.
 
 </details>

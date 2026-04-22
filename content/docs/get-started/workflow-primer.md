@@ -9,7 +9,7 @@ summary: >-
 enableTableOfContents: true
 redirectFrom:
   - /docs/get-started-with-neon/workflow-primer
-updatedOn: '2026-02-15T20:51:54.114Z'
+updatedOn: '2026-03-12T17:34:43.557Z'
 ---
 
 With Neon, you can work with your data just like you work with your code. The key is Neon's database [branching](/docs/guides/branching-intro) feature, which lets you instantly create branches of your data that you can include in your workflow, as many branches as you need.
@@ -138,7 +138,7 @@ Here's how you can integrate Neon branching into your workflow:
 
 ### Development
 
-You can create a Neon branch for every developer on your team. This ensures that every developer has an isolated environment that includes schemas and data. These branches are meant to be long-lived, so each developer can tailor their branch based on their needs. With Neon's [branch reset capability](/docs/manage/branches#reset-a-branch-from-parent), developers can refresh their branch with the latest schemas and data anytime they need.
+You can create a Neon branch for every developer on your team. This ensures that every developer has an isolated environment that includes schemas and data. These branches are meant to be long-lived, so each developer can tailor their branch based on their needs. With Neon's [branch reset capability](/docs/manage/branches#reset-a-branch-from-parent), developers can refresh their branch with the latest schemas and data anytime they need. You can invite teammates to your organization so they have access to all your projects. See [Invite members](/docs/manage/orgs-manage#invite-members).
 
 <Admonition type="tip">
 To easily identify branches dedicated to development, we recommend prefixing the branch name with `dev/<developer-name>` or `dev/<feature-name>` if multiple developers collaborate on the same development branch.
@@ -209,6 +209,6 @@ If you're working with sensitive data and need to avoid copying production data 
 
 ### Automatic branch cleanup
 
-To prevent branch accumulation and manage resources effectively, you can set branches to automatically expire and be deleted after a specified time period. This is particularly useful for temporary environments like CI/CD test branches or time-limited preview deployments. See [Branch expiration](/docs/guides/branch-expiration) for details on configuring automatic branch deletion.
+To prevent branch accumulation and manage resources effectively, you can set branches to automatically expire and be deleted after a specified time period. This is a good fit for temporary environments like CI/CD test branches or time-limited preview deployments. See [Branch expiration](/docs/guides/branch-expiration) for details on configuring automatic branch deletion.
 
 <NeedHelp/>

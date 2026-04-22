@@ -66,6 +66,8 @@ const SHARED_CONTENT_COMPONENTS = {
   NextSteps: 'next-steps',
   NewPricing: 'new-pricing',
   EarlyAccess: 'early-access',
+  AzureRegionsDeprecation: 'azure-regions-deprecation',
+  ConsumptionAccountApiDeprecation: 'consumption-account-api-deprecation',
 };
 
 /**
@@ -157,6 +159,62 @@ function getAttr(node, name) {
   }
 
   return undefined;
+}
+
+/**
+ * Parse an object-style author attribute from an MDX JSX node.
+ * Handles author={{ name: '...', company: '...' }} expressions.
+ * @returns {{ name: string, company: string }} or null if not an object expression
+ */
+function parseAuthorObject(node, attrName = 'author') {
+  const attr = node.attributes?.find((a) => a.type === 'mdxJsxAttribute' && a.name === attrName);
+  if (!attr || attr.value?.type !== 'mdxJsxAttributeValueExpression') return null;
+
+  const expr = attr.value.value || '';
+  const nameMatch = expr.match(/name:\s*['"]([^'"]+)['"]/);
+  const companyMatch = expr.match(/company:\s*['"]([^'"]+)['"]/);
+
+  if (!nameMatch && !companyMatch) return null;
+  return { name: nameMatch ? nameMatch[1] : '', company: companyMatch ? companyMatch[1] : '' };
+}
+
+/**
+ * QuoteBlock slug-to-name map, loaded once from the React component source.
+ */
+let quoteBlockNameMap = null;
+
+function loadQuoteBlockNameMap() {
+  if (quoteBlockNameMap) return quoteBlockNameMap;
+  quoteBlockNameMap = new Map();
+
+  if (!projectRoot) return quoteBlockNameMap;
+
+  const filePath = path.join(projectRoot, 'src/components/shared/quote-block/quote-block.jsx');
+  try {
+    const source = fsSync.readFileSync(filePath, 'utf-8');
+    const regex = /'([^']+)':\s*\{\s*name:\s*'([^']+)'/g;
+    let match;
+    while ((match = regex.exec(source)) !== null) {
+      quoteBlockNameMap.set(match[1], match[2]);
+    }
+  } catch {
+    // File not found (e.g. tests without full repo) — title-case fallback will handle it
+  }
+
+  return quoteBlockNameMap;
+}
+
+/**
+ * Resolve a slug like "lincoln-bergeson" to a human name.
+ * Tries the quote-block map first, then falls back to title-casing.
+ */
+function resolveAuthorSlug(slug) {
+  const map = loadQuoteBlockNameMap();
+  if (map.has(slug)) return map.get(slug);
+  return slug
+    .split('-')
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(' ');
 }
 
 /**
@@ -304,7 +362,7 @@ function loadSharedContent(templateName, props = {}) {
     try {
       rawContent = fsSync.readFileSync(templatePath, 'utf-8');
       sharedContentCache.set(templatePath, rawContent);
-    } catch (err) {
+    } catch (_err) {
       console.warn(`Shared content not found: ${templatePath}`);
       return [];
     }
@@ -378,10 +436,15 @@ const componentHandlers = {
     // Check if children contain block-level content (lists, code blocks, etc.)
     const hasBlockContent = node.children?.some(
       (c) =>
-        c.type === 'list' || c.type === 'code' || c.type === 'heading' || c.type === 'blockquote'
+        c.type === 'list' ||
+        c.type === 'code' ||
+        c.type === 'heading' ||
+        c.type === 'blockquote' ||
+        c.type === 'mdxJsxFlowElement' ||
+        c.type === 'mdxJsxTextElement'
     );
 
-    if (hasBlockContent) {
+    if (hasBlockContent || title) {
       // Return label as its own paragraph, followed by children as block nodes
       return [
         {
@@ -416,10 +479,9 @@ const componentHandlers = {
     visit({ type: 'root', children: node.children }, 'code', (codeNode) => {
       const label = labels[codeBlockIndex] || `Option ${codeBlockIndex + 1}`;
 
-      // Add label as plain text (matches Python output)
       children.push({
         type: 'paragraph',
-        children: [{ type: 'text', value: `Tab: ${label}` }],
+        children: [{ type: 'strong', children: [{ type: 'text', value: label }] }],
       });
 
       // Add the code block
@@ -447,10 +509,9 @@ const componentHandlers = {
         // Get label from Tabs labels array, or fallback to TabItem's own label attribute
         const label = labels[tabIndex] || getAttr(child, 'label') || `Tab ${tabIndex + 1}`;
 
-        // Add tab label (not bold, to match Python output)
         result.push({
           type: 'paragraph',
-          children: [{ type: 'text', value: `Tab: ${label}` }],
+          children: [{ type: 'strong', children: [{ type: 'text', value: label }] }],
         });
 
         // Add tab content (will be recursively transformed)
@@ -476,7 +537,7 @@ const componentHandlers = {
     return [
       {
         type: 'paragraph',
-        children: [{ type: 'text', value: `Tab: ${label}` }],
+        children: [{ type: 'strong', children: [{ type: 'text', value: label }] }],
       },
       ...content,
     ];
@@ -918,11 +979,10 @@ const componentHandlers = {
       return {
         type: 'paragraph',
         children: [
-          { type: 'text', value: 'Apply for the Agent Plan: ' },
           {
             type: 'link',
             url: `${BASE_URL}/use-cases/ai-agents`,
-            children: [{ type: 'text', value: `${BASE_URL}/use-cases/ai-agents` }],
+            children: [{ type: 'text', value: 'Apply for the Agent Plan' }],
           },
         ],
       };
@@ -1026,11 +1086,10 @@ const componentHandlers = {
     return {
       type: 'paragraph',
       children: [
-        { type: 'text', value: 'Watch on YouTube: ' },
         {
           type: 'link',
           url: `https://youtube.com/watch?v=${videoId}`,
-          children: [{ type: 'text', value: `https://youtube.com/watch?v=${videoId}` }],
+          children: [{ type: 'text', value: 'Watch on YouTube' }],
         },
       ],
     };
@@ -1078,7 +1137,7 @@ const componentHandlers = {
     return {
       type: 'paragraph',
       children: [
-        { type: 'text', value: childText ? `${childText} ` : '' },
+        { type: 'text', value: childText ? `${childText}: ` : '' },
         {
           type: 'link',
           url: buttonUrl,
@@ -1130,22 +1189,45 @@ const componentHandlers = {
 
   /**
    * QuoteBlock -> blockquote with attribution
-   * <QuoteBlock quote="..." author="name" role="title" />
+   * Supports author={{ name, company }} objects and author="slug" + role="..." strings.
+   * String slugs are resolved to human names via the quote-block.jsx map.
+   * Optional link prop emits a "Read case study" link.
    */
   QuoteBlock(node) {
-    const quote = getAttr(node, 'quote');
-    const author = getAttr(node, 'author') || '';
-    const role = getAttr(node, 'role') || '';
-
+    const quote = getAttr(node, 'quote') || getAttr(node, 'text') || '';
     if (!quote) return null;
 
     const children = [{ type: 'paragraph', children: [{ type: 'text', value: quote }] }];
 
-    if (author || role) {
-      const attribution = [author, role].filter(Boolean).join(', ');
+    // Try object author first (author={{ name: '...', company: '...' }})
+    const parsed = parseAuthorObject(node, 'author');
+    if (parsed && (parsed.name || parsed.company)) {
+      const attribution = [parsed.name, parsed.company].filter(Boolean).join(', ');
       children.push({
         type: 'paragraph',
         children: [{ type: 'text', value: `— ${attribution}` }],
+      });
+    } else {
+      // Fall back to string author + role
+      const authorSlug = getAttr(node, 'author') || '';
+      const role = getAttr(node, 'role') || '';
+      if (authorSlug || role) {
+        const authorName = authorSlug ? resolveAuthorSlug(authorSlug) : '';
+        const attribution = [authorName, role].filter(Boolean).join(', ');
+        children.push({
+          type: 'paragraph',
+          children: [{ type: 'text', value: `— ${attribution}` }],
+        });
+      }
+    }
+
+    // Include link prop as "Read case study" link
+    const link = getAttr(node, 'link');
+    if (link) {
+      const url = link.startsWith('/') ? `https://neon.com${link}` : link;
+      children.push({
+        type: 'paragraph',
+        children: [{ type: 'link', url, children: [{ type: 'text', value: 'Read case study' }] }],
       });
     }
 
@@ -1160,22 +1242,11 @@ const componentHandlers = {
     const text = getAttr(node, 'text');
     if (!text) return null;
 
-    // author is an object expression, try to parse it
-    let authorName = '';
-    let company = '';
-    const authorAttr = node.attributes?.find((a) => a.name === 'author');
-    if (authorAttr?.value?.type === 'mdxJsxAttributeValueExpression') {
-      const expr = authorAttr.value.value || '';
-      const nameMatch = expr.match(/name:\s*['"]([^'"]+)['"]/);
-      const companyMatch = expr.match(/company:\s*['"]([^'"]+)['"]/);
-      if (nameMatch) authorName = nameMatch[1];
-      if (companyMatch) company = companyMatch[1];
-    }
-
+    const parsed = parseAuthorObject(node, 'author');
     const children = [{ type: 'paragraph', children: [{ type: 'text', value: text }] }];
 
-    if (authorName || company) {
-      const attribution = [authorName, company].filter(Boolean).join(', ');
+    if (parsed && (parsed.name || parsed.company)) {
+      const attribution = [parsed.name, parsed.company].filter(Boolean).join(', ');
       children.push({
         type: 'paragraph',
         children: [{ type: 'text', value: `— ${attribution}` }],
@@ -1196,6 +1267,13 @@ const componentHandlers = {
    * TestimonialsWrapper -> container, extract children
    */
   TestimonialsWrapper(node) {
+    return node.children || null;
+  },
+
+  /**
+   * QuoteBlocksWrapper -> same as TestimonialsWrapper (carousel UI; emit all children for LLMs)
+   */
+  QuoteBlocksWrapper(node) {
     return node.children || null;
   },
 
@@ -1300,7 +1378,6 @@ function transformNode(node) {
     }
 
     // Unknown component - preserve with label and warn
-    // eslint-disable-next-line no-console
     console.warn(`[LLM Processor] Unknown component: <${componentName}>`);
     unknownComponents.push({ name: componentName, file: currentFile || 'unknown' });
 
@@ -1455,7 +1532,96 @@ function getPageUrl(inputPath, baseContentDir) {
   const relativePath = path.relative(baseContentDir, inputPath);
   // Remove .md extension and convert to URL path
   const urlPath = relativePath.replace(/\.md$/, '');
+  // Changelog entries live in content/changelog/ but are served under /docs/changelog/
+  if (urlPath.startsWith('changelog/')) {
+    return `${BASE_URL}/docs/${urlPath}`;
+  }
   return `${BASE_URL}/${urlPath}`;
+}
+
+/**
+ * Build aggregated markdown for docs/changelog.md from content/changelog/*.md
+ * Entries are appended newest-first and run through the same MDX->MD processor.
+ */
+async function buildAggregatedChangelogMarkdown(rootDir) {
+  if (!rootDir) return '';
+
+  const changelogDir = path.join(rootDir, 'content', 'changelog');
+  let entries = [];
+
+  try {
+    entries = await fs.readdir(changelogDir, { withFileTypes: true });
+  } catch {
+    return '';
+  }
+
+  const changelogFiles = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+    .map((entry) => entry.name)
+    .sort((a, b) => b.localeCompare(a));
+
+  if (changelogFiles.length === 0) return '';
+
+  const sections = ['## Entries\n'];
+
+  for (const fileName of changelogFiles) {
+    const changelogPath = path.join(changelogDir, fileName);
+    const slug = fileName.replace(/\.md$/, '');
+    const raw = await fs.readFile(changelogPath, 'utf-8');
+    const previousFile = currentFile;
+    let markdown = '';
+    currentFile = changelogPath;
+
+    try {
+      const entryPageUrl = `${BASE_URL}/docs/changelog/${slug}`;
+      ({ markdown } = await processRawMdx(raw, entryPageUrl));
+    } finally {
+      currentFile = previousFile;
+    }
+
+    sections.push(`\n---\n\n### ${slug}\n\n${markdown}\n`);
+  }
+
+  return `${sections.join('')}\n`;
+}
+
+/**
+ * Run the shared MDX -> markdown pipeline on raw file contents.
+ * Used by both single-file processing and aggregated changelog generation.
+ */
+async function processRawMdx(raw, pageUrl) {
+  await loadDependencies();
+
+  // Pre-fetch any external code URLs before MDX transformation.
+  await prefetchExternalCode(raw);
+
+  const { data: frontmatter, content } = matter(raw);
+
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkMdx)
+    .use(remarkTransformMdxComponents)
+    .use(remarkCleanCodeBlocks)
+    .use(remarkAbsoluteUrls, pageUrl);
+
+  const tree = processor.parse(content);
+  processor.runSync(tree);
+
+  let markdown = toMarkdown(tree, getMarkdownOptions());
+
+  // Convert any remaining relative URLs to absolute (catches URLs in serialized content)
+  markdown = markdown.replace(/\]\(\/([^)]+)\)/g, `](${BASE_URL}/$1)`);
+
+  // Also convert anchor-only links in serialized content
+  if (pageUrl) {
+    markdown = markdown.replace(/\]\(#([^)]+)\)/g, `](${pageUrl}#$1)`);
+  }
+
+  return {
+    frontmatter,
+    markdown: markdown.trim(),
+  };
 }
 
 /**
@@ -1511,7 +1677,6 @@ async function prefetchExternalCode(content) {
     if (result.content) {
       externalCodeCache.set(result.url, result.content);
     } else {
-      // eslint-disable-next-line no-console
       console.warn(
         `[LLM Processor] Failed to fetch external code: ${result.url} (${result.error})`
       );
@@ -1531,8 +1696,6 @@ async function prefetchExternalCode(content) {
  * @param {string} [rootDir] - Project root directory (for shared content)
  */
 async function processFile(inputPath, pageUrl, rootDir) {
-  await loadDependencies();
-
   // Set current file for error reporting
   currentFile = inputPath;
 
@@ -1542,35 +1705,7 @@ async function processFile(inputPath, pageUrl, rootDir) {
   }
 
   const raw = await fs.readFile(inputPath, 'utf-8');
-
-  // Pre-fetch any external code URLs
-  await prefetchExternalCode(raw);
-
-  // Extract frontmatter
-  const { data: frontmatter, content } = matter(raw);
-
-  // Parse MDX into AST
-  const processor = unified()
-    .use(remarkParse)
-    .use(remarkGfm)
-    .use(remarkMdx)
-    .use(remarkTransformMdxComponents)
-    .use(remarkCleanCodeBlocks)
-    .use(remarkAbsoluteUrls, pageUrl);
-
-  const tree = processor.parse(content);
-  processor.runSync(tree);
-
-  // Serialize back to markdown with shared options (includes custom text handler)
-  let markdown = toMarkdown(tree, getMarkdownOptions());
-
-  // Convert any remaining relative URLs to absolute (catches URLs in serialized content)
-  markdown = markdown.replace(/\]\(\/([^)]+)\)/g, `](${BASE_URL}/$1)`);
-
-  // Also convert anchor-only links in serialized content
-  if (pageUrl) {
-    markdown = markdown.replace(/\]\(#([^)]+)\)/g, `](${pageUrl}#$1)`);
-  }
+  const { frontmatter, markdown } = await processRawMdx(raw, pageUrl);
 
   // Build output with frontmatter-based header
   let output = '';
@@ -1586,6 +1721,15 @@ async function processFile(inputPath, pageUrl, rootDir) {
   // }
 
   output += `${markdown.trim()}\n`;
+
+  // docs/changelog.md is a dynamic page in the app router. To provide useful
+  // markdown for AI agents, append all dated changelog entries here.
+  const relativeInputPath = rootDir
+    ? path.relative(rootDir, inputPath).split(path.sep).join('/')
+    : inputPath.split(path.sep).join('/');
+  if (relativeInputPath === 'content/docs/changelog.md') {
+    output += `\n${await buildAggregatedChangelogMarkdown(rootDir)}`;
+  }
 
   // Normalize smart quotes to straight quotes (matches Python behavior)
   output = normalizeQuotes(output);
@@ -1647,6 +1791,7 @@ function clearState() {
   processingErrors.length = 0;
   externalCodeCache.clear();
   sharedContentCache.clear();
+  quoteBlockNameMap = null;
   navigationMap = null;
 }
 
@@ -1775,14 +1920,15 @@ function buildNavigationFooter(slug, navMap) {
 
 /**
  * Build the page header block prepended to every generated markdown file.
- * Always includes the documentation index line. Includes the location line
- * only if the page is in the navigation map with breadcrumbs.
+ * Always includes the documentation index line.
+ * Includes the location line only if the page is in the navigation map with breadcrumbs.
  *
  * @param {string|null} slug - Navigation slug, or null for pages outside nav
  * @param {Map|null} navMap - Navigation map from buildNavigationMap()
- * @returns {string} Header block (1-2 lines in a blockquote, followed by blank line)
+ * @param {string} [_relativePath] - Path relative to content/ (currently unused; kept for API stability)
+ * @returns {string} Header block (blockquote lines, followed by blank line)
  */
-function buildPageHeader(slug, navMap) {
+function buildPageHeader(slug, navMap, _relativePath) {
   const lines = [];
 
   // Location line (only for pages in the nav map)
@@ -1836,7 +1982,7 @@ function addNavigationContext(content, relativePath, navMap) {
   const slug = getNavSlug(relativePath);
 
   // Page header (always added -- index line for all pages, location line when in nav map)
-  const header = buildPageHeader(slug, navMap);
+  const header = buildPageHeader(slug, navMap, relativePath);
   let result = header + content;
 
   // Navigation footer (only for pages in the nav map)
@@ -1848,6 +1994,21 @@ function addNavigationContext(content, relativePath, navMap) {
   }
 
   return result;
+}
+
+/**
+ * Reverse addNavigationContext — strip the header and footer it prepends/appends.
+ * Lives here so it stays in sync with buildPageHeader() and buildNavigationFooter().
+ */
+function stripNavigationContext(content) {
+  let stripped = content.replace(
+    /^(?:> This page location:[^\n]*\n)?> Full Neon documentation index:[^\n]*\n(?:> IMPORTANT: If this page[^\n]*\n)?\n/,
+    ''
+  );
+
+  stripped = stripped.replace(/\n---\n\n## Related docs \([^)]*\)\n[\s\S]*$/, '\n');
+
+  return stripped;
 }
 
 /**
@@ -1874,7 +2035,6 @@ async function processDirectory(inputDir, outputDir, baseContentDir, rootDir) {
         await fs.writeFile(outputPath, result);
         console.log(`✓ ${relativePath}`);
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error(`✗ ${relativePath}: ${error.message}`);
         processingErrors.push({ file: inputPath, error: error.message });
       }
@@ -1937,6 +2097,7 @@ module.exports = {
   buildNavigationFooter,
   buildPageHeader,
   addNavigationContext,
+  stripNavigationContext,
 };
 
 /**

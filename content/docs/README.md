@@ -1,5 +1,5 @@
 ---
-updatedOn: '2026-02-15T20:51:54.024Z'
+updatedOn: '2026-03-23T12:18:17.899Z'
 ---
 
 # Docs
@@ -450,6 +450,38 @@ Information about features that are coming soon.
 
 </details>
 
+## Callout
+
+A highlighted block for supplementary information the reader should notice but that doesn't fit the urgency of an `Admonition`. Use it for tips, best practices, or "good to know" context.
+
+```md
+<Callout>
+
+Your callout content here. Supports paragraphs, lists, and inline code.
+
+</Callout>
+```
+
+To override the default label, pass a `title` prop:
+
+```md
+<Callout title="Before you start">
+
+Make sure you have Node.js 18+ installed.
+
+</Callout>
+```
+
+| Prop       | Type   | Default         | Description                          |
+| ---------- | ------ | --------------- | ------------------------------------ |
+| `children` | node   | (required)      | Content rendered inside the callout  |
+| `title`    | string | `Good to know`  | Label displayed in the header        |
+
+### When to use Callout vs Admonition
+
+- **Callout** — supplementary context, best practices, or neutral "good to know" information.
+- **Admonition** — warnings, important notices, tips with urgency, or coming-soon flags. Use when the information could cause user error if missed.
+
 ## CTA
 
 This is a simple block with title, description text and one CTA button that accomplish certain actions.
@@ -505,7 +537,7 @@ The `TwoColumnLayout` component creates a two-column layout for tutorial pages a
 
 > **Note:** Pages using `TwoColumnLayout` should include `layout: wide` prop to hide the right sidebar (Table of Contents) and provide more space for the two-column layout.
 
-Check [Neon Auth with Next.js](https://neon.com/docs/auth/quick-start/nextjs) and [Neon Auth & Data API TypeScript SDKs](https://neon.com/docs/reference/javascript-sdk) for usage examples.
+Check [Neon Auth with Next.js](https://neon.com/docs/auth/quick-start/nextjs-api-only) and [Neon TypeScript SDK](https://neon.com/docs/reference/javascript-sdk) for usage examples.
 
 ````md
 <TwoColumnLayout>

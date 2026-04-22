@@ -9,7 +9,7 @@ enableTableOfContents: true
 redirectFrom:
   - /docs/quickstart/tanstack-start
   - /docs/integrations/tanstack-start
-updatedOn: '2026-03-04T20:15:14.442Z'
+updatedOn: '2026-03-09T15:58:12.491Z'
 ---
 
 <CopyPrompt src="/prompts/tanstack-start-prompt.md"
@@ -59,28 +59,28 @@ Add a `.env` file to your project directory and add your Neon connection string 
 DATABASE_URL="postgresql://<user>:<password>@<endpoint_hostname>.neon.tech:<port>/<dbname>?sslmode=require&channel_binding=require"
 ```
 
-If you haven't created a database yet, run the following command to generate a [Claimable Postgres by Neon database](https://pg.new/). It will spin up a database instance that you can use for 72 hours, or claim to keep forever.
+If you haven't created a database yet, run the following command to generate a [Claimable Postgres by Neon database](https://neon.new/). It will spin up a database instance that you can use for 72 hours, or claim to keep forever.
 
 <CodeTabs labels={["npm", "yarn", "pnpm", "bun", "deno"]}>
 
 ```bash
-  npm get-db
+  npm neon-new
 ```
 
 ```bash
-  yarn dlx get-db
+  yarn dlx neon-new
 ```
 
 ```bash
-  pnpm get-db
+  pnpm neon-new
 ```
 
 ```bash
-  bunx get-db
+  bunx neon-new
 ```
 
 ```bash
-  deno run -A get-db
+  deno run -A neon-new
 ```
 
 </CodeTabs>
@@ -256,7 +256,7 @@ PostgreSQL 16.0 on x86_64-pc-linux-gnu, compiled by gcc (Debian 10.2.1-6) 10.2.1
 
 ### Where to upload and serve files?
 
-Neon does not provide a built-in file storage service. For managing binary file data (blobs), we recommend a pattern that leverages dedicated, specialized storage services. Follow our guide on [File Storage](/docs/guides/file-storage) to learn more about how to store files in external object storage and file management services and track metadata in Neon.
+Neon does not provide a built-in file storage service. For managing binary file data (blobs), we recommend using dedicated, specialized storage services. Follow our guide on [File Storage](/docs/guides/file-storage) to learn more about how to store files in external object storage and file management services and track metadata in Neon.
 
 ## Source code
 

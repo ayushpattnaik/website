@@ -24,6 +24,7 @@ const Header = ({
   <>
     <HeaderWrapper
       className={className}
+      isDocPage={isDocPage}
       isSticky={isSticky}
       isStickyOverlay={isStickyOverlay}
       theme={theme}
@@ -38,7 +39,7 @@ const Header = ({
         />
       ) : (
         <Container
-          className="!static z-10 flex w-full items-center justify-between md:px-8 sm:px-5"
+          className="static! z-10 flex w-full items-center justify-between md:px-8 sm:px-5"
           size="1920"
         >
           <div className="flex items-center gap-x-[92px] xl:gap-x-10">

@@ -5,7 +5,8 @@
 # This script generates reports of merged PRs from monitored repositories.
 #
 # Release Types:
-#   - "branch": Repos with release branches (e.g., rc/release-control-plane/*)
+#   - "branch": Repos with release branches (e.g., rc/release-*/* and/or
+#     long-lived branches like release-console; optional release_branch_grep in JSON)
 #   - "tag": Repos with release tags (e.g., v1.2.3, release-compute-11092)
 #   - "direct": Repos without formal releases (PRs merge directly to main)
 #
@@ -58,6 +59,14 @@ else
     SINCE_DATE_COMPARE=$(date -u -j -f "%Y-%m-%d" "$SINCE_DATE" "+%Y-%m-%d" 2>/dev/null || date -u -d "$SINCE_DATE" "+%Y-%m-%d" 2>/dev/null || echo "$SINCE_DATE")
 fi
 
+# For git log --since, use start of SINCE_DATE_COMPARE (UTC) when it is a calendar
+# day so merges on that day are included. Plain "N days ago" is rolling-time and
+# can drop same-calendar-day commits (e.g. Mar 13 10:00Z when run Mar 19 evening).
+GIT_LOG_SINCE="$SINCE_DATE"
+if [[ "$SINCE_DATE_COMPARE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+    GIT_LOG_SINCE="${SINCE_DATE_COMPARE}T00:00:00Z"
+fi
+
 mkdir -p "$REPORT_DIR"
 
 echo "======================================"
@@ -82,12 +91,114 @@ cat > "$REPORT" << EOF
 
 EOF
 
+# Git pull results (populated by update_monitored_repos)
+GIT_PULL_OK=()
+GIT_PULL_FAIL=()
+GIT_PULL_SKIP=()
+
+# Run git pull on each monitored repo and record outcome (uses process substitution
+# so arrays persist; a plain pipe to while would run in a subshell on bash 3.2).
+update_monitored_repos() {
+    local name path_raw path err_file err_line
+    while IFS=$'\t' read -r name path_raw; do
+        path=$(echo "$path_raw" | sed "s|^~|$REPOS_BASE|")
+        if [[ ! -d "$path" ]]; then
+            GIT_PULL_SKIP+=("$name - path not found: $path")
+            continue
+        fi
+        if [[ ! -d "$path/.git" ]]; then
+            GIT_PULL_SKIP+=("$name - not a git repository")
+            continue
+        fi
+        err_file=$(mktemp)
+        if (cd "$path" && git pull --quiet 2>"$err_file"); then
+            GIT_PULL_OK+=("$name")
+        else
+            err_line=$(head -n 1 "$err_file" 2>/dev/null | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            if [[ -n "$err_line" ]]; then
+                GIT_PULL_FAIL+=("$name - $err_line")
+            else
+                GIT_PULL_FAIL+=("$name - git pull failed")
+            fi
+        fi
+        rm -f "$err_file"
+    done < <(jq -r '.repos[] | [.name, .path] | @tsv' "$CONFIG_FILE")
+}
+
+# Append git pull status section to the markdown report (call after main report body is written).
+append_git_pull_status_to_report() {
+    local out="$1"
+    {
+        echo ""
+        echo "---"
+        echo ""
+        echo "## Repository \`git pull\` status"
+        echo ""
+        echo "Each monitored repository was updated with \`git pull\` on the current branch before commits were analyzed."
+        echo ""
+        if [[ ${#GIT_PULL_OK[@]} -gt 0 ]]; then
+            echo "### Pulled successfully (${#GIT_PULL_OK[@]})"
+            echo ""
+            for r in "${GIT_PULL_OK[@]}"; do
+                echo "- **$r**"
+            done
+            echo ""
+        fi
+        if [[ ${#GIT_PULL_FAIL[@]} -gt 0 ]]; then
+            echo "### Pull failed (${#GIT_PULL_FAIL[@]})"
+            echo ""
+            for r in "${GIT_PULL_FAIL[@]}"; do
+                echo "- $r"
+            done
+            echo ""
+        fi
+        if [[ ${#GIT_PULL_SKIP[@]} -gt 0 ]]; then
+            echo "### Skipped (${#GIT_PULL_SKIP[@]})"
+            echo ""
+            for r in "${GIT_PULL_SKIP[@]}"; do
+                echo "- $r"
+            done
+            echo ""
+        fi
+    } >> "$out"
+}
+
+# Print git pull summary to stdout (after the report file is complete).
+print_git_pull_status_console() {
+    echo ""
+    echo "======================================"
+    echo "Git pull summary"
+    echo "======================================"
+    echo "OK:      ${#GIT_PULL_OK[@]}"
+    echo "Failed:  ${#GIT_PULL_FAIL[@]}"
+    echo "Skipped: ${#GIT_PULL_SKIP[@]}"
+    if [[ ${#GIT_PULL_OK[@]} -gt 0 ]]; then
+        echo ""
+        echo "Pulled successfully:"
+        for r in "${GIT_PULL_OK[@]}"; do
+            echo "  - $r"
+        done
+    fi
+    if [[ ${#GIT_PULL_FAIL[@]} -gt 0 ]]; then
+        echo ""
+        echo "Pull failed:"
+        for r in "${GIT_PULL_FAIL[@]}"; do
+            echo "  - $r"
+        done
+    fi
+    if [[ ${#GIT_PULL_SKIP[@]} -gt 0 ]]; then
+        echo ""
+        echo "Skipped:"
+        for r in "${GIT_PULL_SKIP[@]}"; do
+            echo "  - $r"
+        done
+    fi
+    echo ""
+}
+
 # Update all repos
 echo "Updating repositories..."
-jq -r '.repos[] | "\(.path)"' "$CONFIG_FILE" | while read -r path; do
-    path=$(echo "$path" | sed "s|^~|$REPOS_BASE|")
-    [ -d "$path/.git" ] && (cd "$path" && git pull --quiet 2>/dev/null) || true
-done
+update_monitored_repos
 echo ""
 
 REPO_COUNT=$(jq '.repos | length' "$CONFIG_FILE")
@@ -244,6 +355,7 @@ for i in $(seq 0 $((REPO_COUNT - 1))); do
     repo=$(jq -r ".repos[$i].github_repo" "$CONFIG_FILE")
     organize=$(jq -r ".repos[$i].organize_by_category" "$CONFIG_FILE")
     group_by_component=$(jq -r ".repos[$i].group_by_release_component // \"false\"" "$CONFIG_FILE")
+    branch_grep=$(jq -r ".repos[$i].release_branch_grep // \"rc/release-\"" "$CONFIG_FILE")
 
     [ ! -d "$path/.git" ] && continue
 
@@ -255,8 +367,9 @@ for i in $(seq 0 $((REPO_COUNT - 1))); do
     REPO_HAD_RELEASES=false
 
     if [ "$rel_type" == "branch" ]; then
-        # Find recent release branches (control-plane and console)
-        for branch in $(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/remotes/origin | grep "rc/release-" | head -5); do
+        # Find recent release branches (RC branches and/or long-lived release-* lines).
+        # release_branch_grep is an extended regex (grep -E); default matches rc/release-* only.
+        for branch in $(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/remotes/origin | grep -E "$branch_grep" | head -25); do
             # Check if branch HEAD is recent (using UTC dates)
             branch_date=$(git log -1 --format=%aI "$branch" 2>/dev/null | cut -d'T' -f1)
 
@@ -277,7 +390,7 @@ for i in $(seq 0 $((REPO_COUNT - 1))); do
     elif [ "$rel_type" == "direct" ]; then
         # Direct merges to main (no releases)
         # Get merged PRs since the time window
-        git log --since="$SINCE_DATE" --first-parent main --format="%s" | \
+        git log --since="$GIT_LOG_SINCE" --first-parent main --format="%s" | \
         while read -r line; do
             # Skip release markers and plain branch merges (without PR numbers)
             echo "$line" | grep -qE "^(chore\(release\)|Release)" && continue
@@ -301,8 +414,9 @@ for i in $(seq 0 $((REPO_COUNT - 1))); do
                 pr=$(echo "$line" | grep -oE '#[0-9]+' | head -1 | tr -d '#' || echo "")
                 [ -n "$pr" ] && line=$(echo "$line" | sed "s|(#${pr})|([#${pr}](https://github.com/${org}/${repo}/pull/${pr}))|")
             else
-                # No PR number found, skip
-                continue
+                # Squash or direct push: subject has no (#NN) — still list for triage
+                [ -z "$line" ] && continue
+                line="$line (direct commit on main, no PR in message)"
             fi
 
             echo "Uncategorized|$line"
@@ -359,7 +473,7 @@ for i in $(seq 0 $((REPO_COUNT - 1))); do
                     [[ "$tag_date" < "$SINCE_DATE_COMPARE" ]] && continue
                     prev=$(git describe --abbrev=0 "$tag_name^" 2>/dev/null || echo "")
                     range="${prev:+$prev..}$tag_name"
-                    git log --since="$SINCE_DATE" --oneline --no-merges "$range" --format="%s" 2>/dev/null | head -30 | \
+                    git log --since="$GIT_LOG_SINCE" --oneline --no-merges "$range" --format="%s" 2>/dev/null | head -30 | \
                     while read -r line; do
                         echo "$line" | grep -qE "^(chore\(release\)|Release)" && continue
                         pr=$(echo "$line" | grep -oE '#[0-9]+' | head -1 | tr -d '#' || echo "")
@@ -443,10 +557,16 @@ if [ ${#REPOS_WITHOUT_RELEASES[@]} -gt 0 ]; then
     echo "" >> "$REPORT"
 fi
 
+append_git_pull_status_to_report "$REPORT"
+
 echo ""
 echo "======================================"
 echo "✅ Report Generated"
 echo "======================================"
 echo "Location: $REPORT"
+echo ""
+echo "Open report: [docs-pr-report-$TIMESTAMP.md](file://$REPORT)"
+echo ""
 echo "Releases: $FOUND_RELEASES"
 echo "Repos with releases: ${#REPOS_WITH_RELEASES[@]}/$REPO_COUNT"
+print_git_pull_status_console

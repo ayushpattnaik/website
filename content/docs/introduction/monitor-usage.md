@@ -2,13 +2,13 @@
 title: Monitor billing and usage
 subtitle: Where to see usage and costs in the Console and via the API
 summary: >-
-  Learn where to monitor usage and costs for your Neon account: the Billing
-  page (account-level), Projects page (org-level), Project dashboard
-  (project-level), and the consumption metrics API for usage-based plans.
+  Learn where to monitor usage and costs for your Neon account: the Billing page
+  (account-level), Projects page (org-level), Project dashboard (project-level),
+  and the consumption metrics API for usage-based plans.
 enableTableOfContents: true
 redirectFrom:
   - /docs/introduction/billing
-updatedOn: '2026-02-06T22:07:33.094Z'
+updatedOn: '2026-03-06T00:10:04.324Z'
 ---
 
 You can monitor usage and costs in the Neon Console or programmatically with the Neon API. For what each metric means and how it maps to your invoice, see [Usage metrics](/docs/introduction/plans#usage-metrics) and [Invoice metrics](/docs/introduction/plans#invoice-metrics) on the Plans page.
@@ -37,6 +37,10 @@ When you open a project, the **Project dashboard** (Project → **Dashboard**) s
 
 Usage is shown since the start of the current billing period. Metrics may be delayed by about an hour and are not updated for inactive projects.
 
+<Admonition type="note">
+Network transfer metrics only appear on the Billing page when your usage exceeds the included allowance for your plan. To track network transfer before it results in charges, check the account usage panel on the **Projects** page, which always displays current usage. You can also monitor programmatically with the [Consumption API](/docs/guides/consumption-metrics). For more on network transfer, see [Network transfer](/docs/introduction/network-transfer).
+</Admonition>
+
 <Admonition type="note" title="Billing metrics for pre-2025 custom contract customers">
 If you signed a contract with Neon prior to 01/01/2025, different billing metrics apply:
 - **Storage** is measured in GiBs instead of [GB-month](/docs/reference/glossary#gb-month), and if you exceed your contract's monthly storage allowance, extra storage units are automatically allocated and billed. Extra storage charges are applied based on the number of additional storage units needed to cover peak storage usage during the current billing period, prorated from the date the extra storage was allocated. Peak usage resets at the beginning of the next billing period.
@@ -49,7 +53,7 @@ If you have questions or want to change the billing metrics defined in your cont
 
 On **usage-based plans** (Launch, Scale, Agent, and Enterprise), use the **project consumption metrics** API. It returns metrics that align with usage-based billing and match your invoice.
 
-See [Querying consumption metrics](/docs/guides/consumption-metrics) for the endpoint, required and optional parameters, example requests and responses, pagination, polling behavior, and building usage dashboards.
+See [Querying consumption metrics](/docs/guides/consumption-metrics) for the endpoint, required and optional parameters, example requests and responses, pagination, polling behavior, and building usage dashboards. For a guide to converting the raw API values into billing units and calculating your costs, see [Usage and cost calculations](/docs/introduction/usage-calculations).
 
 <Admonition type="tip" title="Optimize your costs">
 For strategies to reduce your Neon costs across compute, storage, branches, and data transfer, see [Cost optimization](/docs/introduction/cost-optimization).

@@ -11,7 +11,7 @@ redirectFrom:
   - /docs/cloud/getting-started/
   - /docs/cloud/getting_started/
   - /docs/get-started-with-neon/signing-up
-updatedOn: '2026-02-15T20:51:54.110Z'
+updatedOn: '2026-03-12T17:34:43.554Z'
 ---
 
 <InfoBlock>
@@ -38,7 +38,7 @@ After signing up, you'll start with a `production` branch:
 
 - `production` is your project's root default branch (default: 0.25-2 CU, adjustable up to 56 CU)
 
-You can create additional branches for development, staging, and other environments. For development branches, consider using a smaller compute size (0.25-1 CU) to optimize costs, while keeping production appropriately sized for your workload.
+You can create additional branches for development, staging, and other environments. For development branches, consider using a smaller compute size (0.25-1 CU) to optimize costs, while keeping production appropriately sized for your workload. All computes scale to zero after 5 minutes of inactivity by default, which keeps costs low for development branches. On paid plans, you can disable this for production if you need always-active compute. See [Scale to zero](/docs/introduction/scale-to-zero).
 
 <Steps>
 
@@ -81,6 +81,10 @@ The steps should be self-explanatory, but it's important to understand a few key
   - You can create additional branches for development, staging, previews, and other workflows as needed
 
 At this point, if you want to just get started connecting Neon to your toolchain, go to [Connecting Neon to your tools](/docs/get-started/connect-neon). Or if you want a more detailed walkthrough of some of our key console and branching features, let's keep going.
+
+<Admonition type="tip" title="Working with a team?">
+Your organization is now set up. You can start inviting teammates immediately. See [Invite members](/docs/manage/orgs-manage#invite-members).
+</Admonition>
 
 ## Add sample data
 

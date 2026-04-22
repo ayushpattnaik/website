@@ -34,6 +34,8 @@ You can also retrieve advisor issues via the [Neon API](https://api-docs.neon.te
 GET /projects/{project_id}/advisors
 ```
 
+This endpoint requires Data API to be enabled for the target project and branch.
+
 Optional query parameters:
 
 - `branch_id`: Target branch (defaults to the primary branch)
@@ -757,7 +759,7 @@ Start with a standard `VACUUM` which runs without locking the table:
 VACUUM <schema>.<table>;
 ```
 
-If that is not sufficient, `VACUUM FULL` reclaims more space but **locks the table** for the duration. Duration scales with table size — plan for potential downtime on large tables.
+If that is not sufficient, `VACUUM FULL` reclaims more space but **locks the table** for the duration. Duration scales with table size, so plan for potential downtime on large tables.
 
 ```sql
 VACUUM FULL <schema>.<table>;

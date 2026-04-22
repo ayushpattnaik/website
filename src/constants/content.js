@@ -10,8 +10,8 @@ const PROGRAMS_DIR_PATH = `${TEMPLATE_PAGES_DIR_PATH}/programs`;
 const AUTOSCALING_REPORT_DIR_PATH = `${CONTENT_DIR_PATH}/autoscaling-report`;
 
 const CONTENT_ROUTES = {
-  docs: DOCS_DIR_PATH,
   'docs/changelog': CHANGELOG_DIR_PATH,
+  docs: DOCS_DIR_PATH,
   postgresql: POSTGRESQL_DIR_PATH,
   'use-cases': USE_CASES_DIR_PATH,
   guides: GUIDES_DIR_PATH,
@@ -19,13 +19,7 @@ const CONTENT_ROUTES = {
   programs: PROGRAMS_DIR_PATH,
 };
 
-const EXCLUDED_ROUTES = [
-  'docs/changelog',
-  'guides',
-  'branching',
-  'use-cases/multi-tb',
-  'use-cases/serverless-apps',
-];
+const EXCLUDED_ROUTES = ['guides', 'branching', 'use-cases/multi-tb', 'use-cases/serverless-apps'];
 
 const EXCLUDED_FILES = ['rss.xml'];
 

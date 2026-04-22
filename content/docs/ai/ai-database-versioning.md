@@ -14,7 +14,7 @@ updatedOn: '2026-02-27T19:55:46.370Z'
 <Admonition type="note" title="Beta">
 Snapshots are available in Beta. Please give us [Feedback](https://console.neon.tech/app/projects?modal=feedback) from the Neon Console or by connecting with us on [Discord](https://discord.gg/92vNTzKDGp).
 
-**Limits and pricing:** The Free plan includes 1 manual snapshot, and paid plans (including the [Agent plan](https://neon.com/use-cases/ai-agents)) include 10 manual snapshots. On paid plans, snapshots created by backup schedules do not count toward this limit. Snapshots are provided free of charge during beta, and will be charged based on GB-month storage at a rate lower than standard project storage after GA. If you need higher limits, please reach out to [Neon support](/docs/introduction/support).
+**Limits and pricing:** The Free plan includes 1 manual snapshot, and paid plans (including the [Agent plan](https://neon.com/use-cases/ai-agents)) include 10 manual snapshots. On paid plans, snapshots created by backup schedules do not count toward this limit. Snapshots are free during the Beta period. Snapshot storage will be billed at $0.09/GB-month, starting May 1, 2026. If you need higher limits, please reach out to [Neon support](/docs/introduction/support).
 </Admonition>
 
 ## Overview
@@ -101,6 +101,8 @@ curl --request POST \
      --url 'https://console.neon.tech/api/v2/projects/{project_id}/branches/{branch_id}/snapshot?name=version-session-1&expires_at=2025-08-13T00:00:00Z' \
      --header 'authorization: Bearer $NEON_API_KEY'
 ```
+
+**Response:** The JSON body includes a `snapshot` object. It may include optional **`full_size`** and **`diff_size`** (bytes) for storage size; the same fields appear when you [list](https://api-docs.neon.tech/reference/listsnapshots) or [update](https://api-docs.neon.tech/reference/updatesnapshot) snapshots. See [Snapshot size fields in API responses](/docs/guides/backup-restore#snapshot-size-fields-in-api-responses).
 
 **When to create snapshots:**
 

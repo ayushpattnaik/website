@@ -6,12 +6,12 @@ summary: >-
   Neon databases, enabling access from browsers and serverless functions while
   ensuring scalability and security.
 enableTableOfContents: true
-updatedOn: '2026-02-06T22:07:32.814Z'
+updatedOn: '2026-03-20T21:22:58.811Z'
 ---
 
 <FeatureBetaProps feature_name="Neon Data API" />
 
-The Neon Data API provides a secure, stateless HTTP interface to your database. It allows you to access and manage your data directly from web browsers, serverless functions, and edge runtimes using standard HTTP methods. Key benefits include:
+The Neon Data API provides a secure, stateless HTTP interface to your database. It lets you access and manage your data directly from web browsers, serverless functions, and edge runtimes using standard HTTP methods. Key benefits include:
 
 - **Browser & edge compatibility**
 
@@ -19,11 +19,11 @@ The Neon Data API provides a secure, stateless HTTP interface to your database. 
 
 - **Connectionless scalability**
 
-  Eliminate connection pool exhaustion. Because the API uses short-lived HTTP requests instead of persistent TCP connections, it effortlessly handles thousands of concurrent users and serverless auto-scaling.
+  Eliminate connection pool exhaustion. Because the API uses short-lived HTTP requests instead of persistent TCP connections, it handles thousands of concurrent users and serverless auto-scaling.
 
 - **Secure by default**
 
-  The API is designed to expose your database safely. It integrates with Neon Auth and respects PostgreSQL [Row-Level Security (RLS)](/docs/guides/row-level-security) policies, ensuring users only access the data they are explicitly permitted to see.
+  The API validates JWTs from any authentication provider and respects PostgreSQL [Row-Level Security (RLS)](/docs/guides/row-level-security) policies, ensuring users only access the data they are explicitly permitted to see. Use [Neon Auth](/docs/auth/overview), or bring your own provider like [Auth0, Clerk, Firebase, and others](/docs/data-api/custom-authentication-providers).
 
 - **CI/CD integration**
 
@@ -41,7 +41,7 @@ The Neon Data API is fully compatible with [PostgREST](https://postgrest.org/en/
 
 <a href="/docs/data-api/demo" description="Explore our demo note-taking app to learn Data API queries with RLS." icon="audio-jack">Tutorial</a>
 
-<a href="/docs/reference/javascript-sdk" description="Complete reference for authentication and database query methods." icon="code">Neon Auth & Data API TypeScript SDKs</a>
+<a href="/docs/reference/javascript-sdk" description="Complete reference for authentication and database query methods." icon="code">Neon TypeScript SDK</a>
 
 <a href="/docs/data-api/sql-to-rest" description="Convert SQL queries into RESTful HTTP requests." icon="sql">SQL to REST Converter</a>
 

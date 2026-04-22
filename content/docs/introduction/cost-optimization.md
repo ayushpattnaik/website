@@ -6,7 +6,7 @@ summary: >-
   usage, including right-sizing, effective autoscaling, enabling scale to zero,
   and managing persistent connections.
 enableTableOfContents: true
-updatedOn: '2026-03-03T14:18:20.109Z'
+updatedOn: '2026-03-20T16:01:10.992Z'
 ---
 
 Managing your Neon costs effectively requires understanding how each billing factor works and implementing strategies to control usage. This guide provides actionable recommendations for optimizing costs across all billing metrics.
@@ -135,7 +135,7 @@ In short, `VACUUM FULL` can help reduce your data size and future storage costs,
 <details>
 <summary>**What is the maximum data size that Neon supports?**</summary>
 
-Paid plans (Launch and Scale) support a logical data size of up to 16 TB per branch. The Free plan is limited to 0.5 GB per project. To increase the 16 TB limit, [contact the Neon Sales team](/contact-sales).
+Paid plans (Launch and Scale) support a logical data size of up to 16 TB per branch. The Free plan is limited to 0.5 GB per project. To increase the 16 TB limit, [request an increase in the feedback form in console](https://console.neon.tech/app/settings?modal=feedback&modalparams=%22Storage%20limit%20increase%22).
 
 </details>
 
@@ -161,9 +161,11 @@ Extra branches beyond your plan's allowance are billed at $1.50/branch-month, pr
 
 - **Automate cleanup.** Consider implementing automated cleanup scripts using the [Neon API](/docs/manage/branches#branching-with-the-neon-api) or [Neon CLI](/docs/guides/branching-neon-cli) to stay within your plan's branch allowance.
 
+- **Check Vercel retention settings.** If you use the Vercel-Managed integration, Vercel's default deployment retention policy can delay automatic branch cleanup by months. Reduce the retention period or set up a GitHub Action for immediate cleanup. See [Managing Vercel preview branch cleanup](/docs/guides/vercel-branch-cleanup).
+
 ## Public data transfer
 
-Public network transfer (egress) is the data sent from your databases over the public internet. Free plans include 5 GB/month. On paid plans, the first 100 GB/month is included, then $0.10/GB. You see no data transfer cost until you exceed that allowance, so the charge might show up unexpectedly if you're not monitoring data transfer.
+Public network transfer (egress) is the data sent from your databases over the public internet. Free plans include 5 GB/month. On paid plans, the first 100 GB/month is included, then $0.10/GB. You see no data transfer cost until you exceed that allowance, so the charge might show up unexpectedly if you're not monitoring data transfer. For a deeper look at what causes high network transfer and how to monitor it, see [Network transfer](/docs/introduction/network-transfer).
 
 **Optimization strategies:**
 

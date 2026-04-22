@@ -284,16 +284,16 @@ const McpSetupConfigurator = () => {
   return (
     <div className="my-5 rounded-xl border border-gray-new-90 dark:border-gray-new-20">
       <div className="border-b border-gray-new-90 bg-gray-new-98 p-5 dark:border-gray-new-20 dark:bg-gray-new-8">
-        <h3 className="mb-1 mt-0 text-base font-semibold text-gray-new-10 dark:text-white">
+        <h3 className="mt-0 mb-1 text-base font-semibold text-gray-new-10 dark:text-white">
           MCP Server Config Generator
         </h3>
-        <p className="mb-5 mt-0 text-sm text-gray-new-40 dark:text-gray-new-60">
+        <p className="mt-0 mb-5 text-sm text-gray-new-40 dark:text-gray-new-60">
           Generate valid MCP client configuration for the hosted Neon MCP server.
         </p>
 
         <div className="space-y-3">
           <fieldset className={OPTION_BLOCK_CLASS}>
-            <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-new-40 dark:text-gray-new-60">
+            <legend className="mb-2 text-xs font-semibold tracking-wide text-gray-new-40 uppercase dark:text-gray-new-60">
               Auth mode
             </legend>
             <ToggleGroup
@@ -310,14 +310,14 @@ const McpSetupConfigurator = () => {
 
           {authMode === 'apiKey' && (
             <label className={clsx('block', OPTION_BLOCK_CLASS)}>
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-new-40 dark:text-gray-new-60">
+              <span className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-new-40 uppercase dark:text-gray-new-60">
                 API key
               </span>
               <input
                 type="text"
                 value={apiKey}
                 placeholder="<NEON_API_KEY>"
-                className="w-full rounded-lg border border-gray-new-90 bg-white px-3 py-2 text-sm text-gray-new-20 outline-none transition-colors focus:border-secondary-8 dark:border-gray-new-20 dark:bg-gray-new-10 dark:text-gray-new-90 dark:focus:border-primary-1"
+                className="w-full rounded-lg border border-gray-new-90 bg-white px-3 py-2 text-sm text-gray-new-20 transition-colors outline-none focus:border-secondary-8 dark:border-gray-new-20 dark:bg-gray-new-10 dark:text-gray-new-90 dark:focus:border-primary-1"
                 onChange={(event) => setApiKey(event.target.value)}
               />
               <span className="mt-2 block text-[13px] leading-relaxed text-gray-new-40 dark:text-gray-new-60">
@@ -343,14 +343,14 @@ const McpSetupConfigurator = () => {
           </div>
 
           <label className={clsx('block', OPTION_BLOCK_CLASS)}>
-            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-new-40 dark:text-gray-new-60">
+            <span className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-new-40 uppercase dark:text-gray-new-60">
               Limit access to one project (optional)
             </span>
             <input
               type="text"
               value={projectId}
               placeholder="proj_123"
-              className="w-full rounded-lg border border-gray-new-90 bg-white px-3 py-2 text-sm text-gray-new-20 outline-none transition-colors focus:border-secondary-8 dark:border-gray-new-20 dark:bg-gray-new-10 dark:text-gray-new-90 dark:focus:border-primary-1"
+              className="w-full rounded-lg border border-gray-new-90 bg-white px-3 py-2 text-sm text-gray-new-20 transition-colors outline-none focus:border-secondary-8 dark:border-gray-new-20 dark:bg-gray-new-10 dark:text-gray-new-90 dark:focus:border-primary-1"
               onChange={(event) => setProjectId(event.target.value)}
             />
             <span className="mt-2 block text-[13px] leading-relaxed text-gray-new-40 dark:text-gray-new-60">
@@ -360,7 +360,7 @@ const McpSetupConfigurator = () => {
           </label>
 
           <fieldset className={OPTION_BLOCK_CLASS}>
-            <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-new-40 dark:text-gray-new-60">
+            <legend className="mb-2 text-xs font-semibold tracking-wide text-gray-new-40 uppercase dark:text-gray-new-60">
               Tool access categories
             </legend>
             <p className="mb-2 text-[13px] leading-relaxed text-gray-new-40 dark:text-gray-new-60">
@@ -401,7 +401,7 @@ const McpSetupConfigurator = () => {
         {authMode === 'oauth' && (
           <div className="rounded-lg border border-secondary-9/60 bg-secondary-9/25 px-4 py-3 text-[13px] text-gray-new-20 dark:border-secondary-7/40 dark:bg-secondary-7/10 dark:text-gray-new-90">
             <strong>Safety note:</strong>
-            <p className="mb-0 mt-2">
+            <p className="mt-2 mb-0">
               In OAuth mode, read-only/project/scope-category behavior depends on the active OAuth
               session. Once authorized, logging out and signing in again is required after config
               changes.
@@ -410,7 +410,7 @@ const McpSetupConfigurator = () => {
         )}
 
         <div className="rounded-lg border border-gray-new-90 px-4 py-3 text-[13px] dark:border-gray-new-20">
-          <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-new-40 dark:text-gray-new-60">
+          <p className="mb-1 text-xs font-medium tracking-wide text-gray-new-40 uppercase dark:text-gray-new-60">
             Selected tools ({selectedTools.length})
           </p>
           {toolsPreviewLoading && (
@@ -465,7 +465,7 @@ const McpSetupConfigurator = () => {
           )}
           {!toolsPreviewLoading && !toolsPreviewError && (
             <div className="mt-4">
-              <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-new-40 dark:text-gray-new-60">
+              <p className="mb-1 text-xs font-medium tracking-wide text-gray-new-40 uppercase dark:text-gray-new-60">
                 Not included ({notIncludedTools.length})
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -498,26 +498,26 @@ const McpSetupConfigurator = () => {
         )}
 
         <div>
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-new-40 dark:text-gray-new-60">
+          <span className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-new-40 uppercase dark:text-gray-new-60">
             add-mcp command
           </span>
           <CodeBlockWrapper
             className="rounded-lg border border-gray-new-90 dark:border-gray-new-20 [&>pre]:my-0 [&>pre]:!bg-gray-new-98 [&>pre]:dark:!bg-gray-new-10"
             as="div"
-            copyText={addMcpCommand}
+            copyCode={addMcpCommand}
           >
             <HighlightedCode code={addMcpCommand} language="bash" />
           </CodeBlockWrapper>
         </div>
 
         <div>
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-new-40 dark:text-gray-new-60">
+          <span className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-new-40 uppercase dark:text-gray-new-60">
             MCP JSON config
           </span>
           <CodeBlockWrapper
             className="rounded-lg border border-gray-new-90 dark:border-gray-new-20 [&>pre]:my-0 [&>pre]:!bg-gray-new-98 [&>pre]:dark:!bg-gray-new-10"
             as="div"
-            copyText={generatedConfig}
+            copyCode={generatedConfig}
           >
             <HighlightedCode code={generatedConfig} language="json" />
           </CodeBlockWrapper>
