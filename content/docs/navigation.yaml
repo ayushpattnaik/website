@@ -550,6 +550,8 @@
                   slug: ai/agent-skills
                 - title: Claude Code plugin
                   slug: ai/ai-claude-code-plugin
+                - title: Codex plugin
+                  slug: ai/ai-codex-plugin
                 - title: Cursor plugin
                   slug: ai/ai-cursor-plugin
                 - title: GitHub Copilot agents
@@ -1070,6 +1072,9 @@
           slug: introduction/agent-plan
         - title: Manage billing
           slug: introduction/manage-billing
+        - title: Spending limit
+          slug: introduction/spending-limit
+          tag: new
         - title: Monitor billing
           slug: introduction/monitor-usage
         - title: Usage and cost calculations

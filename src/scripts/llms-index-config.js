@@ -27,9 +27,23 @@ module.exports = {
 
   // Quick-reference links emitted as "## Common Queries" before the section list.
   commonQueries: [
-    { label: 'Pricing and Plans', url: 'https://neon.com/pricing.md' },
-    { label: 'Regions', url: 'https://neon.com/docs/introduction/regions.md' },
-    { label: 'API Reference', url: 'https://neon.com/docs/reference/api-reference.md' },
+    { label: 'Pricing and plans', url: 'https://neon.com/pricing.md' },
+    {
+      label: 'Choose a connection method (drivers, pooling, serverless)',
+      url: 'https://neon.com/docs/connect/choose-connection.md',
+    },
+    {
+      label: 'Troubleshoot connection errors and timeouts',
+      url: 'https://neon.com/docs/connect/connection-errors.md',
+    },
+    {
+      label: 'pgvector extension for vector search and embeddings',
+      url: 'https://neon.com/docs/extensions/pgvector.md',
+    },
+    {
+      label: 'Neon API reference (projects, branches, databases, endpoints)',
+      url: 'https://neon.com/docs/reference/api-reference.md',
+    },
   ],
 
   // Sections in display order. Unlisted sections append alphabetically at the end.
@@ -162,7 +176,17 @@ module.exports = {
     {
       name: 'PostgreSQL',
       description:
-        'Postgres query optimization, indexing strategies, version upgrades, and general Postgres usage with Neon.',
+        'Postgres functions, data types, query optimization, indexing strategies, version upgrades, and general Postgres usage with Neon.',
+      subsectionOrder: ['General', 'Functions', 'Data Types'],
+      subIndex: {
+        outputPath: 'public/docs/postgresql/llms.txt',
+        url: 'https://neon.com/docs/postgresql/llms.txt',
+        highlights: [
+          'postgresql/query-reference.md',
+          'postgresql/query-performance.md',
+          'postgresql/index-types.md',
+        ],
+      },
     },
     {
       name: 'Security',
@@ -171,10 +195,25 @@ module.exports = {
     },
     {
       name: 'Extensions',
-      collapse: {
-        title: 'Postgres extensions',
-        url: 'https://neon.com/docs/extensions/pg-extensions.md',
-        description: 'Supported extensions, versions, and install/update instructions',
+      description: 'Postgres extensions supported by Neon, with install and usage instructions.',
+      subIndex: {
+        outputPath: 'public/docs/extensions/llms.txt',
+        url: 'https://neon.com/docs/extensions/llms.txt',
+        highlights: [
+          'extensions/pg-extensions.md',
+          'extensions/pg_stat_statements.md',
+          'extensions/pgvector.md',
+          'extensions/pgcrypto.md',
+        ],
+      },
+    },
+    {
+      name: 'Community',
+      description: 'Contributor guides, component architecture, and documentation standards.',
+      subIndex: {
+        outputPath: 'public/docs/community/llms.txt',
+        url: 'https://neon.com/docs/community/llms.txt',
+        highlights: ['community/contribution-guide.md', 'community/llms-markdown-guide.md'],
       },
     },
   ],
@@ -183,14 +222,9 @@ module.exports = {
   // For the "docs" route, paths are relative to content/docs/.
   excludePaths: [
     'azure/',
-    'community/',
-    'functions/',
-    'data-types/',
     'auth/legacy/',
     'auth/migrate/from-auth-v0.1',
-    'auth/migrate/from-legacy-auth',
     'changelog.md',
-    'get-started/production-readiness.md',
     'guides/GUIDE_TEMPLATE.md',
     'introduction.md',
   ],
@@ -209,7 +243,12 @@ module.exports = {
 
   // Prefix-based reclassification (first match wins). More maintainable than
   // listing individual files when an entire path subtree should move together.
-  reclassifyPrefixes: [{ pathPrefix: 'reference/cli-', section: 'Neon CLI' }],
+  reclassifyPrefixes: [
+    { pathPrefix: 'reference/cli-', section: 'Neon CLI' },
+    { pathPrefix: 'postgresql/', section: 'PostgreSQL', subsection: 'General' },
+    { pathPrefix: 'data-types/', section: 'PostgreSQL', subsection: 'Data Types' },
+    { pathPrefix: 'functions/', section: 'PostgreSQL', subsection: 'Functions' },
+  ],
 
   // Route keys from CONTENT_ROUTES to collapse instead of scanning.
   // Each becomes a single link in the Additional Resources section.
@@ -228,6 +267,11 @@ module.exports = {
       title: 'Community Guides',
       url: 'https://neon.com/guides',
       description: 'Step-by-step tutorials for frameworks and tools',
+    },
+    faqs: {
+      title: 'FAQs',
+      url: 'https://neon.com/faqs',
+      description: 'Frequently asked questions about Neon',
     },
     'use-cases': null,
     programs: null,
@@ -248,7 +292,15 @@ module.exports = {
   // Section `collapse` settings are index-only and do not apply here.
   fullText: {
     // Routes from CONTENT_ROUTES to skip entirely.
-    excludeRoutes: ['docs/changelog', 'postgresql', 'guides', 'branching', 'use-cases', 'programs'],
+    excludeRoutes: [
+      'docs/changelog',
+      'postgresql',
+      'guides',
+      'faqs',
+      'branching',
+      'use-cases',
+      'programs',
+    ],
     // When true, do not exclude additionalResources[].sourcePath files
     // (e.g., glossary.md stays in its natural section instead of being excluded).
     includeAdditionalResourcePaths: true,

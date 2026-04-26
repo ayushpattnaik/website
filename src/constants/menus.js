@@ -200,35 +200,6 @@ export default {
           text: 'Security',
           to: LINKS.security,
         },
-        {
-          text: 'Legal',
-          links: [
-            {
-              text: 'Privacy Policy',
-              to: LINKS.privacy,
-            },
-            {
-              text: 'Terms of Use',
-              to: LINKS.terms,
-            },
-            {
-              text: 'DPA',
-              to: LINKS.dpa,
-            },
-            {
-              text: 'Subprocessors List',
-              to: LINKS.subprocessors,
-            },
-            {
-              text: 'Cookie Policy',
-              to: LINKS.cookiePolicy,
-            },
-            {
-              text: 'Business Information',
-              to: LINKS.businessInformation,
-            },
-          ],
-        },
       ],
     },
     {
@@ -249,6 +220,10 @@ export default {
         {
           text: 'Community Guides',
           to: LINKS.guides,
+        },
+        {
+          text: 'FAQs',
+          to: LINKS.faqs,
         },
         {
           text: 'PostgreSQL Tutorial',

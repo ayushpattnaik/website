@@ -18,14 +18,15 @@ import InfoBlock from 'components/pages/doc/info-block';
 import LinkPreview from 'components/pages/doc/link-preview';
 import PromptCards from 'components/pages/doc/prompt-cards';
 import Steps from 'components/pages/doc/steps';
+import StickyTable from 'components/pages/doc/sticky-table';
 import Tabs from 'components/pages/doc/tabs';
 import TabItem from 'components/pages/doc/tabs/tab-item';
 import TechCards from 'components/pages/doc/tech-cards';
 import TwoColumnLayout from 'components/pages/doc/two-column-layout';
 import Video from 'components/pages/doc/video';
 import YoutubeIframe from 'components/pages/doc/youtube-iframe';
+import QuoteBlocksWrapper from 'components/pages/use-case/quote-blocks-wrapper';
 import SubscriptionForm from 'components/pages/use-case/subscription-form';
-import QuoteBlocksWrapper from 'components/pages/use-case/testimonials-wrapper';
 import UseCaseContext from 'components/pages/use-case/use-case-context';
 import UseCaseList from 'components/pages/use-case/use-case-list';
 import Admonition from 'components/shared/admonition';
@@ -37,7 +38,6 @@ import CodeBlock from 'components/shared/code-block';
 import ComputeCalculator from 'components/shared/compute-calculator';
 import CopyPrompt from 'components/shared/copy-prompt';
 // import CtaBlock from 'components/shared/cta-block';
-import DeployPostgresButton from 'components/shared/deploy-postgres-button';
 import DocCta from 'components/shared/doc-cta';
 import ExternalCode from 'components/shared/external-code';
 import GradientBorder from 'components/shared/gradient-border';
@@ -194,8 +194,8 @@ const getComponents = (withoutAnchorHeading, isReleaseNote, isPostgres, isTempla
   Steps,
   TwoColumnLayout,
   LogosSection,
-  DeployPostgresButton,
   ChatOptions,
+  StickyTable,
   CheckList,
   CheckItem,
   ExternalCode: (props) => <ExternalCode {...props} />,

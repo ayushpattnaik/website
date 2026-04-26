@@ -29,7 +29,7 @@
   }
 
   .table-wrapper {
-    @apply my-10 max-h-[70vh] overflow-auto 2xl:-mx-4 2xl:px-4;
+    @apply my-10 overflow-auto 2xl:-mx-4 2xl:px-4;
   }
 
   .table {
@@ -56,18 +56,6 @@
     .column_definition {
       text-indent: -3.5em;
       word-spacing: 0.25em;
-    }
-  }
-
-  .tab-item {
-    > * {
-      &:first-child {
-        @apply mt-0;
-      }
-
-      &:last-child {
-        @apply mb-0;
-      }
     }
   }
 }
@@ -114,7 +102,7 @@
       @apply mt-10;
     }
 
-    @apply prose-h2:mt-7 prose-h2:mb-0 prose-h2:text-[28px] prose-h2:leading-tight prose-h2:font-medium prose-h2:tracking-tighter;
+    @apply prose-h2:mt-14 prose-h2:mb-0 prose-h2:text-[28px] prose-h2:leading-tight prose-h2:font-medium prose-h2:tracking-tighter md:prose-h2:mt-11;
     @apply prose-h3:text-xl prose-h3:leading-snug prose-h3:font-medium prose-h3:tracking-extra-tight;
     @apply prose-h4:text-lg prose-h4:leading-snug prose-h4:font-medium prose-h4:tracking-extra-tight;
     @apply prose-p:mt-[1.125rem] prose-p:mb-6 prose-p:text-lg prose-p:leading-normal prose-p:font-normal prose-p:tracking-tight prose-p:text-gray-new-30 dark:prose-p:text-gray-new-80;
@@ -127,6 +115,12 @@
     > h3:first-child,
     > h4:first-child {
       @apply mt-5;
+    }
+
+    .changelog-list & {
+      > *:first-child {
+        @apply mt-0 pt-0 sm:mt-0 sm:pt-0;
+      }
     }
 
     .admonition h4 {
@@ -165,6 +159,27 @@
       }
     }
 
+    .tab-item {
+      > * {
+        &:first-child {
+          @apply mt-0;
+        }
+
+        &:last-child {
+          @apply mb-0;
+        }
+      }
+
+      ul > li,
+      ol > li {
+        @apply text-base leading-snug tracking-extra-tight;
+      }
+
+      ul > li::before {
+        @apply text-base leading-snug;
+      }
+    }
+
     ol {
       @apply list-decimal pl-9.5 md:pl-5;
 
@@ -194,7 +209,7 @@
     }
 
     .table-wrapper {
-      @apply my-10 max-h-[70vh] overflow-auto 2xl:-mx-4 2xl:px-4;
+      @apply my-10 overflow-auto 2xl:-mx-4 2xl:px-4;
     }
 
     table {
@@ -211,7 +226,7 @@
       }
 
       th {
-        @apply p-3 pt-0 text-left align-top leading-snug font-medium tracking-extra-tight;
+        @apply p-3 text-left align-top leading-snug font-medium tracking-extra-tight;
       }
 
       td {
@@ -229,6 +244,26 @@
       tbody {
         tr {
           @apply border-b border-gray-new-80 text-gray-new-30 dark:border-gray-new-20 dark:text-white;
+        }
+      }
+    }
+
+    .sticky-table {
+      @apply relative lg:[--docs-header-height:0px];
+    }
+
+    .sticky-table-header {
+      @apply pointer-events-none fixed top-(--docs-header-height) z-40 overflow-hidden bg-white dark:bg-black-pure 2xl:px-4;
+
+      table {
+        @apply my-0;
+      }
+
+      thead {
+        @apply static;
+
+        tr {
+          @apply border-b border-gray-new-80 dark:border-gray-new-20;
         }
       }
     }
@@ -261,7 +296,7 @@
     }
 
     :not(pre) > code {
-      @apply inline-flex items-center justify-center rounded border border-gray-new-70 bg-gray-new-98 px-1! py-px! font-mono! text-sm leading-[1.2] font-normal! tracking-extra-tight break-words text-black-pure! dark:border-gray-new-30 dark:bg-black-new dark:text-white!;
+      @apply my-px inline-flex items-center justify-center rounded border border-gray-new-70 bg-gray-new-98 px-1! py-px! font-mono! text-sm leading-[1.2] font-normal! tracking-extra-tight break-words text-black-pure! dark:border-gray-new-30 dark:bg-black-new dark:text-white!;
       overflow-wrap: anywhere;
       word-break: break-word;
       white-space: normal;
@@ -420,6 +455,20 @@
 
     .wp-block-table {
       @apply md:-mx-4 md:overflow-x-auto md:px-4;
+    }
+
+    .table-wrapper {
+      @apply max-h-none! overflow-x-auto!;
+    }
+
+    .table-wrapper table,
+    .wp-block-table table {
+      table-layout: fixed !important;
+      overflow-wrap: break-word !important;
+    }
+
+    .anchor-heading span > svg {
+      display: none;
     }
   }
 
